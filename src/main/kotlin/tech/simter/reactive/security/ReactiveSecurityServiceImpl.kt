@@ -33,4 +33,12 @@ class ReactiveSecurityServiceImpl : ReactiveSecurityService {
   override fun verifyHasAllRole(vararg roles: String): Mono<Void> {
     return SystemContext.verifyHasAllRole(*roles)
   }
+
+  override fun hasRole(roleA: String, roleB: String): Mono<Pair<Boolean, Boolean>> {
+    return SystemContext.hasRole(roleA, roleB)
+  }
+
+  override fun hasRole(roleA: String, roleB: String, roleC: String): Mono<Triple<Boolean, Boolean, Boolean>> {
+    return SystemContext.hasRole(roleA, roleB, roleC)
+  }
 }

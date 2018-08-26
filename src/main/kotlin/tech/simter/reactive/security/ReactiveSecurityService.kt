@@ -53,4 +53,14 @@ interface ReactiveSecurityService {
    * Otherwise return [Mono.empty].
    */
   fun verifyHasAllRole(vararg roles: String): Mono<Void>
+
+  /**
+   * Determine whether the system-context has [roleA], [roleB].
+   */
+  fun hasRole(roleA: String, roleB: String): Mono<Pair<Boolean, Boolean>>
+
+  /**
+   * Determine whether the system-context has [roleA], [roleB], [roleC].
+   */
+  fun hasRole(roleA: String, roleB: String, roleC: String): Mono<Triple<Boolean, Boolean, Boolean>>
 }
