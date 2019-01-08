@@ -8,7 +8,7 @@ Simter reactive security service.
 <dependency>
   <groupId>tech.simter.reactive</groupId>
   <artifactId>simter-reactive-security</artifactId>
-  <version>0.5.0</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
