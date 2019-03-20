@@ -11,3 +11,23 @@ module.authorization.simter-sample:
       roles: ["X_CREAT", "X_UPDATE"]
       strategy: "And"
     delete.roles: "X_DELETE"
+
+# multiple module AuthorizeProperties
+module.authorization.multiple-module:
+  defaultPermission: "Deny"
+  modules:
+    m1:
+      defaultPermission: "Allow"
+      operations:
+        read:
+          roles: ["X_READ1", "X_READ2"]
+          strategy: "Or"
+        create:
+          roles: ["X_CREAT", "X_UPDATE"]
+          strategy: "And"
+        delete:
+          roles: ["X_DELETE"]
+    m2.operations:
+      read.roles: ["Y_READ1", "Y_READ2"]
+      create.roles: ["Y_CREAT", "Y_UPDATE"]
+      delete.roles: ["Y_DELETE"]
