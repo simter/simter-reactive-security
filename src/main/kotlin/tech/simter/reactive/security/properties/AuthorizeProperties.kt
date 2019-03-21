@@ -9,6 +9,43 @@ import tech.simter.reactive.security.properties.PermissionStrategy.Allow
 import tech.simter.reactive.security.properties.PermissionStrategy.Deny
 
 /**
+ * Multiple modules authorize properties.
+ *
+ * YML file config sample:
+ *
+ * ```
+ * module.authorization.simter-kv:
+ *   defaultPermission: "Deny"
+ *   modules:
+ *     m1:
+ *       operations:
+ *         read.roles: ["X_READ1", "X_READ2"]
+ *         create:
+ *           roles: ["X_CREAT", "X_UPDATE"]
+ *           strategy: "and"
+ *         delete.roles: ["X_DELETE"]
+ *     m2.operations:
+ *       read.roles: ["Y_READ1", "Y_READ2"]
+ *       create.roles: ["Y_CREAT", "Y_UPDATE"]
+ *       delete.roles: ["Y_DELETE"]
+ * ```
+ */
+data class ModulesAuthorizeProperties(
+  /**
+   * All config modules.
+   *
+   *  The key is the module identity, such as 'simter-kv', 'simter-file'.
+   */
+  val modules: Map<String, ModuleAuthorizeProperties> = HashMap(),
+  /**
+   * The default permission behavior for the module not config in [modules].
+   *
+   * The value could be [Deny] or [Allow], default value is [Deny]
+   */
+  var defaultPermission: PermissionStrategy = Deny
+)
+
+/**
  * The module authorize properties.
  *
  * YML file config sample:
