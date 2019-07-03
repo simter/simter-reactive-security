@@ -1,4 +1,11 @@
-# Changelog for simter-reactive-security package
+# simter-reactive-security changelog
+
+## 1.1.0 - 2019-07-03
+
+- Change parent to simter-dependencies-1.2.0
+- Add ModuleAuthorizeProperties
+- Add ModuleAuthorizer
+- Simplify JUnit5 config
 
 ## 1.0.0 - 2019-01-08
 
