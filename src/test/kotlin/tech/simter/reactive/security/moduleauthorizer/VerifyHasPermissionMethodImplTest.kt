@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import reactor.core.publisher.Mono
-import reactor.test.test
+import reactor.kotlin.test.test
 import tech.simter.exception.PermissionDeniedException
 import tech.simter.reactive.security.ModuleAuthorizer
 import tech.simter.reactive.security.ModuleAuthorizer.Companion.ALLOWER
@@ -34,8 +34,7 @@ class VerifyHasPermissionMethodImplTest {
   fun `explicit deny anything`() {
     DENIER.verifyHasPermission("any")
       .test()
-      .expectError(PermissionDeniedException::class.java)
-      .verify()
+      .verifyError(PermissionDeniedException::class.java)
   }
 
   @ParameterizedTest
@@ -52,7 +51,7 @@ class VerifyHasPermissionMethodImplTest {
 
     val test = moduleAuthorizer.verifyHasPermission(operation).test()
     if (passed) test.verifyComplete()
-    else test.expectError(PermissionDeniedException::class.java).verify()
+    else test.verifyError(PermissionDeniedException::class.java)
 
     verify(exactly = 1) {
       properties.operations[operation]
@@ -78,7 +77,7 @@ class VerifyHasPermissionMethodImplTest {
 
     val test = moduleAuthorizer.verifyHasPermission(operation).test()
     if (passed) test.verifyComplete()
-    else test.expectError(PermissionDeniedException::class.java).verify()
+    else test.verifyError(PermissionDeniedException::class.java)
 
     verify(exactly = 1) {
       properties.operations[operation]
@@ -104,7 +103,7 @@ class VerifyHasPermissionMethodImplTest {
 
     val test = moduleAuthorizer.verifyHasPermission(operation).test()
     if (passed) test.verifyComplete()
-    else test.expectError(PermissionDeniedException::class.java).verify()
+    else test.verifyError(PermissionDeniedException::class.java)
 
     verify(exactly = 1) {
       properties.operations[operation]

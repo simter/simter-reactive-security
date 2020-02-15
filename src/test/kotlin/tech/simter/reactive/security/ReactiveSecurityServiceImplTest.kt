@@ -3,7 +3,7 @@ package tech.simter.reactive.security
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import tech.simter.exception.PermissionDeniedException
 import tech.simter.exception.UnauthenticatedException
 import tech.simter.reactive.context.SystemContext.DataHolder
@@ -17,19 +17,17 @@ class ReactiveSecurityServiceTest @Autowired constructor(
 ) {
   @Test
   fun getAuthenticatedUser_Success() {
-    val mono = securityService.getAuthenticatedUser()
+    securityService.getAuthenticatedUser()
       .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-
-    StepVerifier.create(mono)
+      .test()
       .expectNext(Optional.of(DEFAULT_USER))
       .verifyComplete()
   }
 
   @Test
   fun getAuthenticatedUser_WithoutSystemContext() {
-    val mono = securityService.getAuthenticatedUser()
-
-    StepVerifier.create(mono)
+    securityService.getAuthenticatedUser()
+      .test()
       .expectNext(Optional.empty())
       .verifyComplete()
   }
@@ -37,32 +35,32 @@ class ReactiveSecurityServiceTest @Autowired constructor(
   @Test
   fun hasAnyRole_Success() {
     // one roles
-    StepVerifier.create(
-      securityService.hasAnyRole("ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    )
+    securityService.hasAnyRole("ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
       .expectNext(true)
       .verifyComplete()
 
     // two roles
-    StepVerifier.create(
-      securityService.hasAnyRole("NOT_EXISTS", "ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    )
+    securityService.hasAnyRole("NOT_EXISTS", "ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
       .expectNext(true)
       .verifyComplete()
   }
 
   @Test
   fun hasAnyRole_FailedByWithoutRole() {
-    StepVerifier.create(securityService.hasAnyRole("NOT_EXISTS"))
+    securityService.hasAnyRole("NOT_EXISTS")
+      .test()
       .expectNext(false)
       .verifyComplete()
   }
 
   @Test
   fun hasAnyRole_FailedByWithoutSystemContext() {
-    StepVerifier.create(securityService.hasAnyRole("ADMIN"))
+    securityService.hasAnyRole("ADMIN")
+      .test()
       .expectNext(false)
       .verifyComplete()
   }
@@ -70,18 +68,16 @@ class ReactiveSecurityServiceTest @Autowired constructor(
   @Test
   fun hasAllRole_Success() {
     // one roles
-    StepVerifier.create(
-      securityService.hasAllRole("ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    )
+    securityService.hasAllRole("ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
       .expectNext(true)
       .verifyComplete()
 
     // two roles
-    StepVerifier.create(
-      securityService.hasAllRole("COMMON", "ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    )
+    securityService.hasAllRole("COMMON", "ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
       .expectNext(true)
       .verifyComplete()
   }
@@ -89,19 +85,22 @@ class ReactiveSecurityServiceTest @Autowired constructor(
   @Test
   fun hasAllRole_FailedByWithoutRole() {
     // one roles
-    StepVerifier.create(securityService.hasAllRole("NOT_EXISTS"))
+    securityService.hasAllRole("NOT_EXISTS")
+      .test()
       .expectNext(false)
       .verifyComplete()
 
     // two roles
-    StepVerifier.create(securityService.hasAllRole("NOT_EXISTS", "ADMIN"))
+    securityService.hasAllRole("NOT_EXISTS", "ADMIN")
+      .test()
       .expectNext(false)
       .verifyComplete()
   }
 
   @Test
   fun hasAllRole_FailedByWithoutSystemContext() {
-    StepVerifier.create(securityService.hasAllRole("ADMIN"))
+    securityService.hasAllRole("ADMIN")
+      .test()
       .expectNext(false)
       .verifyComplete()
   }
@@ -109,31 +108,31 @@ class ReactiveSecurityServiceTest @Autowired constructor(
   @Test
   fun verifyHasAnyRole_Success() {
     // one roles
-    StepVerifier.create(
-      securityService.verifyHasAnyRole("ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    ).verifyComplete()
+    securityService.verifyHasAnyRole("ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
+      .verifyComplete()
 
     // two roles
-    StepVerifier.create(
-      securityService.verifyHasAnyRole("COMMON", "ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    ).verifyComplete()
+    securityService.verifyHasAnyRole("COMMON", "ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
+      .verifyComplete()
   }
 
   @Test
   fun verifyHasAnyRole_ErrorWithUnauthenticated() {
-    StepVerifier.create(securityService.verifyHasAnyRole("ANY"))
+    securityService.verifyHasAnyRole("ANY")
+      .test()
       .expectError(UnauthenticatedException::class.java)
       .verify()
   }
 
   @Test
   fun verifyHasAnyRole_ErrorWithPermissionDenied() {
-    StepVerifier.create(
-      securityService.verifyHasAnyRole("NOT_EXISTS")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    )
+    securityService.verifyHasAnyRole("NOT_EXISTS")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
       .expectError(PermissionDeniedException::class.java)
       .verify()
   }
@@ -141,31 +140,30 @@ class ReactiveSecurityServiceTest @Autowired constructor(
   @Test
   fun verifyHasAllRole_Success() {
     // one roles
-    StepVerifier.create(
-      securityService.verifyHasAllRole("ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    ).verifyComplete()
+    securityService.verifyHasAllRole("ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test().verifyComplete()
 
     // two roles
-    StepVerifier.create(
-      securityService.verifyHasAllRole("COMMON", "ADMIN")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    ).verifyComplete()
+    securityService.verifyHasAllRole("COMMON", "ADMIN")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
+      .verifyComplete()
   }
 
   @Test
   fun verifyHasAllRole_ErrorWithUnauthenticated() {
-    StepVerifier.create(securityService.verifyHasAllRole("ANY"))
+    securityService.verifyHasAllRole("ANY")
+      .test()
       .expectError(UnauthenticatedException::class.java)
       .verify()
   }
 
   @Test
   fun verifyHasAllRole_ErrorWithPermissionDenied() {
-    StepVerifier.create(
-      securityService.verifyHasAllRole("NOT_EXISTS")
-        .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
-    )
+    securityService.verifyHasAllRole("NOT_EXISTS")
+      .subscriberContext { it.put(SYSTEM_CONTEXT_KEY, DEFAULT_SYSTEM_CONTEXT) }
+      .test()
       .expectError(PermissionDeniedException::class.java)
       .verify()
   }
