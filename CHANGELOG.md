@@ -1,5 +1,13 @@
 # simter-reactive-security changelog
 
+## 1.2.0-M1 - 2020-02-15
+
+- Support multiple operations permission checking on ModuleAuthorizer [#1]
+- Use reactor-kotlin-extensions to avoid deprecated warning
+- Upgrade to simter-1.3.0-M13
+
+[#1]: https://github.com/simter/simter-reactive-security/issues/1
+
 ## 1.1.1 - 2019-09-27
 
 - Fixed kotlin compile config
