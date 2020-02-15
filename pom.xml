@@ -9,7 +9,7 @@
   </parent>
   <groupId>tech.simter.reactive</groupId>
   <artifactId>simter-reactive-security</artifactId>
-  <version>1.1.1</version>
+  <version>1.2.0-M1</version>
   <packaging>jar</packaging>
   <name>simter-reactive-security</name>
   <description>Simter reactive security service</description>
