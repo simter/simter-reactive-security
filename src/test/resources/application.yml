@@ -1,13 +1,13 @@
 spring.main.banner-mode: 'off'
 
 # config simter-sample module authorize properties
-module.authorization.simter-sample:
-  defaultPermission: "Allow"
+simter-sample.authorization:
+  default-permission: "Allow"
   operations:
     read:
       roles: ["X_READ1", "X_READ2"]
       strategy: "Or"
     "[create,update]":               # create or update
-      roles: ["X_CREAT", "X_UPDATE"]
+      roles: ["X_CREATE", "X_UPDATE"]
       strategy: "And"
     delete.roles: "X_DELETE"

@@ -24,7 +24,7 @@ class YmlModuleAuthorizePropertiesTest @Autowired constructor(
   @EnableConfigurationProperties
   class Cfg {
     @Bean
-    @ConfigurationProperties(prefix = "module.authorization.simter-sample")
+    @ConfigurationProperties(prefix = "simter-sample.authorization")
     fun moduleAuthorizer(): ModuleAuthorizeProperties {
       return ModuleAuthorizeProperties()
     }
@@ -37,7 +37,7 @@ class YmlModuleAuthorizePropertiesTest @Autowired constructor(
     assertEquals(3, moduleAuthorizer.operations.size)
     assertEquals(Allow, moduleAuthorizer.defaultPermission)
     assertEquals(OperationAuthorizeProperties(strategy = Or, roles = listOf("X_READ1", "X_READ2")), moduleAuthorizer.operations["read"])
-    assertEquals(OperationAuthorizeProperties(strategy = And, roles = listOf("X_CREAT", "X_UPDATE")), moduleAuthorizer.operations["create,update"])
+    assertEquals(OperationAuthorizeProperties(strategy = And, roles = listOf("X_CREATE", "X_UPDATE")), moduleAuthorizer.operations["create,update"])
     assertEquals(OperationAuthorizeProperties(strategy = Or, roles = listOf("X_DELETE")), moduleAuthorizer.operations["delete"])
   }
 }
