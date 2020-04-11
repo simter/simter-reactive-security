@@ -122,8 +122,11 @@ interface ModuleAuthorizer {
      * 1. [securityService.hasAnyRole(roles)][ReactiveSecurityService.hasAnyRole] if [operation.strategy][OperationAuthorizeProperties.strategy] is [LogicStrategy.Or].
      * 2. [securityService.hasAllRole(roles)][ReactiveSecurityService.hasAllRole] if [operation.strategy][OperationAuthorizeProperties.strategy] is [LogicStrategy.And].
      */
-    fun create(properties: ModuleAuthorizeProperties, securityService: ReactiveSecurityService)
-      : ModuleAuthorizer = object : ModuleAuthorizer {
+    fun create(
+      properties: ModuleAuthorizeProperties,
+      securityService: ReactiveSecurityService,
+      denyMessage: String = "Permission denied on %1\$s %2\$s" // such as 'Permission denied on User CREATE'
+    ): ModuleAuthorizer = object : ModuleAuthorizer {
       override fun hasPermission(operation: String): Mono<Boolean> {
         return properties.operations[operation]?.run {
           when (strategy) {
@@ -141,11 +144,18 @@ interface ModuleAuthorizer {
           when (strategy) {
             LogicStrategy.Or -> securityService.verifyHasAnyRole(*roles.toTypedArray())
             LogicStrategy.And -> securityService.verifyHasAllRole(*roles.toTypedArray())
-          }.onErrorMap { PermissionDeniedException("Verify has '$operation' permission failed", it) }
+          }.onErrorMap {
+            PermissionDeniedException(denyMessage.format(
+              properties.name,
+              if (this.name.isEmpty()) operation else this.name
+            ), it)
+          }
         } ?: when (properties.defaultPermission) {
           PermissionStrategy.Allow -> Mono.empty()
-          PermissionStrategy.Deny -> Mono.error(PermissionDeniedException(
-            "Verify has '$operation' permission failed because without config and default deny"))
+          PermissionStrategy.Deny -> Mono.error(PermissionDeniedException(denyMessage.format(
+            properties.name,
+            operation
+          )))
         }
       }
 
