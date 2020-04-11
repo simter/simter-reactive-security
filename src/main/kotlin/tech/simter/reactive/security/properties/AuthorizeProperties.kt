@@ -39,7 +39,13 @@ data class ModuleAuthorizeProperties(
    *
    * The value could be [Deny] or [Allow], default value is [Deny]
    */
-  var defaultPermission: PermissionStrategy = Deny
+  var defaultPermission: PermissionStrategy = Deny,
+  /**
+   * The label for describe the authorizer.
+   *
+   * Default value is a empty string.
+   */
+  var name: String = ""
 )
 
 /**
@@ -53,7 +59,13 @@ data class OperationAuthorizeProperties(
    *
    * The value could be [Or] or [And], default value is [Or].
    */
-  var strategy: LogicStrategy = Or
+  var strategy: LogicStrategy = Or,
+  /**
+   * The label for describe the operation.
+   *
+   * Default value is a empty string.
+   */
+  var name: String = ""
 )
 
 /**

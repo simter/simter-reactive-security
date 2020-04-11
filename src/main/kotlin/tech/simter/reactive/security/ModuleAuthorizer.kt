@@ -148,6 +148,9 @@ interface ModuleAuthorizer {
             "Verify has '$operation' permission failed because without config and default deny"))
         }
       }
+
+      /** A description */
+      val name: String = properties.name
     }
   }
 }
