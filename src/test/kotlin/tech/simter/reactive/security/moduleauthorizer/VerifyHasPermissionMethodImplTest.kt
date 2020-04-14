@@ -3,7 +3,9 @@ package tech.simter.reactive.security.moduleauthorizer
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -109,6 +111,73 @@ class VerifyHasPermissionMethodImplTest constructor(
     verify {
       properties.operations[operation]
       securityService.verifyHasAllRole(operation)
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["", "AuthorizerName,OperationName"])
+  fun `default deny message`(result: String) {
+    // mock
+    val operationKey = UUID.randomUUID().toString()
+    val s = result.split(",")
+    val authorizerName = s[0]
+    val operationName = if (s.size > 1) s[1] else operationKey
+    val properties = mockk<ModuleAuthorizeProperties>(relaxed = true) {
+      every { operations[operationKey] } returns OperationAuthorizeProperties(
+        roles = listOf(operationKey), name = operationName
+      )
+      every { name } returns authorizerName
+    }
+    every { securityService.verifyHasAnyRole(operationKey) } returns Mono.error(PermissionDeniedException())
+
+    // invoke and verify
+    ModuleAuthorizer.create(
+      properties = properties,
+      securityService = securityService
+    ).verifyHasPermission(operationKey)
+      .test()
+      .consumeErrorWith {
+        val msg = "Permission denied on $authorizerName $operationName"
+        assertThat(it).isInstanceOf(PermissionDeniedException::class.java).hasMessage(msg)
+      }
+      .verify()
+    verify {
+      properties.operations[operationKey]
+      securityService.verifyHasAnyRole(operationKey)
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["", "AuthorizerName,OperationName"])
+  fun `custom deny message`(result: String) {
+    // mock
+    val operationKey = UUID.randomUUID().toString()
+    val s = result.split(",")
+    val authorizerName = s[0]
+    val operationName = if (s.size > 1) s[1] else operationKey
+    val properties = mockk<ModuleAuthorizeProperties>(relaxed = true) {
+      every { operations[operationKey] } returns OperationAuthorizeProperties(
+        roles = listOf(operationKey), name = operationName
+      )
+      every { name } returns authorizerName
+    }
+    every { securityService.verifyHasAnyRole(operationKey) } returns Mono.error(PermissionDeniedException())
+
+    // invoke and verify
+    ModuleAuthorizer.create(
+      properties = properties,
+      securityService = securityService,
+      denyMessage = "A %1\$s B %2\$s C"
+    ).verifyHasPermission(operationKey)
+      .test()
+      .consumeErrorWith {
+        val msg = "A $authorizerName B $operationName C"
+        assertThat(it).isInstanceOf(PermissionDeniedException::class.java).hasMessage(msg)
+      }
+      .verify()
+    verify {
+      properties.operations[operationKey]
+      securityService.verifyHasAnyRole(operationKey)
     }
   }
 }
