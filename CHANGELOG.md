@@ -1,5 +1,9 @@
 # simter-reactive-security changelog
 
+## 2.0.0-M1 - 2020-06-02
+
+- Upgrade to simter-2.0.0-M1
+
 ## 1.2.0-M2 - 2020-04-15
 
 - Support custom deny message for ModuleAuthorizer
