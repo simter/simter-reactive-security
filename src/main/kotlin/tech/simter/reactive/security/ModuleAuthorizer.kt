@@ -159,6 +159,24 @@ interface ModuleAuthorizer {
         }
       }
 
+      override fun verifyHasAnyPermission(vararg operations: String): Mono<Void> {
+        return if (operations.isEmpty()) Mono.error(IllegalArgumentException("operations could not be empty"))
+        else operations.toFlux().flatMap { hasPermission(it) }.any { it }
+          .flatMap<Void> {
+            if (it) Mono.empty()
+            else Mono.error(PermissionDeniedException(denyMessage.format(properties.name)))
+          }
+      }
+
+      override fun verifyHasAllPermission(vararg operations: String): Mono<Void> {
+        return if (operations.isEmpty()) Mono.error(IllegalArgumentException("operations could not be empty"))
+        else operations.toFlux().flatMap { hasPermission(it) }.all { it }
+          .flatMap<Void> {
+            if (it) Mono.empty()
+            else Mono.error(PermissionDeniedException(denyMessage.format(properties.name)))
+          }
+      }
+
       /** A description */
       val name: String = properties.name
     }
