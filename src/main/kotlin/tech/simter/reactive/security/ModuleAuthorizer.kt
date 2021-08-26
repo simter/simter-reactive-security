@@ -19,7 +19,7 @@ interface ModuleAuthorizer {
   /**
    * Determine whether the system-context has permission to do the specific [operation].
    *
-   * Return `Mono.just(true)` if has a authenticated system-context and it has permission to do the specific [operation],
+   * Return `Mono.just(true)` if has an authenticated system-context, and it has permission to do the specific [operation],
    * otherwise return `Mono.just(false)`.
    */
   fun hasPermission(operation: String): Mono<Boolean>
@@ -27,17 +27,17 @@ interface ModuleAuthorizer {
   /**
    * Verify whether the system-context has permission to do the specific [operation].
    *
-   * Return a [Mono.error] with [UnauthenticatedException] if without a authenticated system-context.
-   * Or return a [Mono.error] with [PermissionDeniedException] if has a authenticated system-context but it has'ont permission to do the specific [operation].
-   * Otherwise return [Mono.empty].
+   * Return a [Mono.error] with [UnauthenticatedException] if without an authenticated system-context.
+   * Or return a [Mono.error] with [PermissionDeniedException] if has an authenticated system-context, but it hasn't permission to do the specific [operation].
+   * Otherwise, return [Mono.empty].
    */
   fun verifyHasPermission(operation: String): Mono<Void>
 
   /**
    * Determine whether the system-context has permission to do any specific [operations].
    *
-   * Return `Mono.just(true)` if has a authenticated system-context and it has permission to do any specific [operations],
-   * otherwise return `Mono.just(false)`.
+   * Return `Mono.just(true)` if has an authenticated system-context, and it has permission to do any specific [operations].
+   * Otherwise, return `Mono.just(false)`.
    *
    * Return a [Mono.error] with [IllegalArgumentException] if [operations] is empty.
    */
@@ -49,22 +49,22 @@ interface ModuleAuthorizer {
   /**
    * Verify whether the system-context has permission to do any specific [operations].
    *
-   * Return a [Mono.error] with [UnauthenticatedException] if without a authenticated system-context.
-   * Or return a [Mono.error] with [PermissionDeniedException] if has a authenticated system-context but it has'ont permission to do any specific [operations].
-   * Otherwise return [Mono.empty].
+   * Return a [Mono.error] with [UnauthenticatedException] if without an authenticated system-context.
+   * Or return a [Mono.error] with [PermissionDeniedException] if has an authenticated system-context, but it hasn't permission to do any specific [operations].
+   * Otherwise, return [Mono.empty].
    *
    * Return a [Mono.error] with [IllegalArgumentException] if [operations] is empty.
    */
   fun verifyHasAnyPermission(vararg operations: String): Mono<Void> {
     return if (operations.isEmpty()) Mono.error(IllegalArgumentException("operations could not be empty"))
     else operations.toFlux().flatMap { hasPermission(it) }.any { it }
-      .flatMap<Void> { if (it) Mono.empty() else Mono.error(PermissionDeniedException()) }
+      .flatMap<Void> { if (it) Mono.empty() else Mono.error(PermissionDeniedException("permission denied")) }
   }
 
   /**
    * Determine whether the system-context has permission to do all specific [operations].
    *
-   * Return `Mono.just(true)` if has a authenticated system-context and it has permission to do all specific [operations],
+   * Return `Mono.just(true)` if has an authenticated system-context, and it has permission to do all specific [operations],
    * otherwise return `Mono.just(false)`.
    *
    * Return a [Mono.error] with [IllegalArgumentException] if [operations] is empty.
@@ -77,16 +77,16 @@ interface ModuleAuthorizer {
   /**
    * Verify whether the system-context has permission to do all specific [operations].
    *
-   * Return a [Mono.error] with [UnauthenticatedException] if without a authenticated system-context.
-   * Or return a [Mono.error] with [PermissionDeniedException] if has a authenticated system-context but it has'ont permission to do all specific [operations].
-   * Otherwise return [Mono.empty].
+   * Return a [Mono.error] with [UnauthenticatedException] if without an authenticated system-context.
+   * Or return a [Mono.error] with [PermissionDeniedException] if has an authenticated system-context, but it hasn't permission to do all specific [operations].
+   * Otherwise, return [Mono.empty].
    *
    * Return a [Mono.error] with [IllegalArgumentException] if [operations] is empty.
    */
   fun verifyHasAllPermission(vararg operations: String): Mono<Void> {
     return if (operations.isEmpty()) Mono.error(IllegalArgumentException("operations could not be empty"))
     else operations.toFlux().flatMap { hasPermission(it) }.all { it }
-      .flatMap<Void> { if (it) Mono.empty() else Mono.error(PermissionDeniedException()) }
+      .flatMap<Void> { if (it) Mono.empty() else Mono.error(PermissionDeniedException("permission denied")) }
   }
 
   companion object {
@@ -118,7 +118,7 @@ interface ModuleAuthorizer {
      * If the specific operation not config in [properties.operations][ModuleAuthorizeProperties.operations],
      * use [properties.defaultPermission][ModuleAuthorizeProperties.defaultPermission] as default behavior.
      *
-     * Otherwise estimate the operation permission by :
+     * Otherwise, estimate the operation permission by :
      * 1. [securityService.hasAnyRole(roles)][ReactiveSecurityService.hasAnyRole] if [operation.strategy][OperationAuthorizeProperties.strategy] is [LogicStrategy.Or].
      * 2. [securityService.hasAllRole(roles)][ReactiveSecurityService.hasAllRole] if [operation.strategy][OperationAuthorizeProperties.strategy] is [LogicStrategy.And].
      */
@@ -147,7 +147,7 @@ interface ModuleAuthorizer {
           }.onErrorMap {
             PermissionDeniedException(denyMessage.format(
               properties.name,
-              if (this.name.isEmpty()) operation else this.name
+              this.name.ifEmpty { operation }
             ), it)
           }
         } ?: when (properties.defaultPermission) {
