@@ -1,5 +1,9 @@
 # simter-reactive-security changelog
 
+## 2.0.1 - 2021-08-26
+
+- Fixed `verifyHasAnyPermission` and `verifyHasAllPermission` without error message when implements by `ModuleAuthorizer.create`
+
 ## 2.0.0 - 2020-11-19
 
 - Upgrade to simter-dependencies-2.0.0
