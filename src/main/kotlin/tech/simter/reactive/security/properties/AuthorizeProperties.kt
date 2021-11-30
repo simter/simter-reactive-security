@@ -14,7 +14,7 @@ import tech.simter.reactive.security.properties.PermissionStrategy.Deny
  * YML file config sample:
  *
  * ```
- * module.authorization.simter-kv:
+ * simter-kv.authorization:
  *   defaultPermission: "Allow"
  *   operations:
  *     read:
