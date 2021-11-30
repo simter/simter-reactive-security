@@ -179,6 +179,10 @@ interface ModuleAuthorizer {
 
       /** A description */
       val name: String = properties.name
+
+      override fun toString(): String {
+        return name.ifEmpty { this.hashCode().toString() }
+      }
     }
   }
 }
